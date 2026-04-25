@@ -1,34 +1,20 @@
-FROM php:8.2-apache
+FROM php:8.2-cli
 
 # ============================================
 # Dockerfile untuk UMKM Keuangan REST API
-# Deploy ke Railway
+# Deploy ke Railway tanpa Apache
 # ============================================
 
-# Install ekstensi PDO MySQL
+WORKDIR /app
+
+# Install ekstensi PDO MySQL untuk koneksi database Railway/MySQL.
 RUN docker-php-ext-install pdo pdo_mysql
 
-# Fix "More than one MPM loaded":
-# Hapus file eksplisit (bukan glob) untuk mpm_event & mpm_worker,
-# lalu aktifkan HANYA mpm_prefork.
-RUN rm -f /etc/apache2/mods-enabled/mpm_event.load \
-          /etc/apache2/mods-enabled/mpm_event.conf \
-          /etc/apache2/mods-enabled/mpm_worker.load \
-          /etc/apache2/mods-enabled/mpm_worker.conf \
- && a2enmod mpm_prefork rewrite
+# Copy file backend yang tidak diabaikan oleh .dockerignore.
+COPY . .
 
-# Izinkan .htaccess berfungsi
-RUN sed -i 's/AllowOverride None/AllowOverride All/g' /etc/apache2/apache2.conf
+# Railway memberikan port lewat environment variable PORT.
+# Default 8080 dipakai agar tetap bisa dites lokal dengan Docker.
+EXPOSE 8080
 
-# Copy semua file project ke document root Apache
-COPY . /var/www/html/
-
-# Set permission
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html
-
-# Expose port 80
-EXPOSE 80
-
-# Jalankan Apache secara foreground (wajib di Docker)
-CMD ["apache2-foreground"]
+CMD ["sh", "-c", "php -S 0.0.0.0:${PORT:-8080} -t /app"]
