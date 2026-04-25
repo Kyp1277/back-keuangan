@@ -1,0 +1,16 @@
+# Abaikan file yang tidak perlu di-upload ke Railway/Git
+node_modules/
+.env
+.env.local
+
+# File lama yang sudah digantikan oleh /api
+auth/
+dashboard/
+transaksi/
+kategori/
+laporan/
+includes/
+
+# File development lokal
+*.log
+.DS_Store
