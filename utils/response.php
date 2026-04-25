@@ -9,12 +9,22 @@
 /**
  * Set semua header CORS yang diperlukan.
  * Wajib dipanggil di AWAL setiap file API
- * agar frontend (Vercel) bisa mengakses backend (Railway).
+ * agar frontend (Vercel) bisa mengakses backend (Render).
  */
 function setCorsHeaders(): void {
-    header("Access-Control-Allow-Origin: *");
+    $allowedOrigins = array_filter(array_map(
+        'trim',
+        explode(',', getenv('FRONTEND_URL') ?: 'https://front-keuangan.vercel.app')
+    ));
+    $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+    $allowOrigin = in_array($origin, $allowedOrigins, true)
+        ? $origin
+        : ($allowedOrigins[0] ?? '*');
+
+    header("Access-Control-Allow-Origin: $allowOrigin");
     header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
-    header("Access-Control-Allow-Headers: Content-Type, Authorization");
+    header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
+    header("Access-Control-Max-Age: 86400");
     header("Content-Type: application/json; charset=UTF-8");
 
     // Browser mengirim request OPTIONS sebelum request asli (preflight).

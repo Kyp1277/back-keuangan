@@ -3,8 +3,6 @@
 -- Database: umkm_keuangan
 -- ============================================
 
-CREATE DATABASE IF NOT EXISTS umkm_keuangan CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE umkm_keuangan;
 
 -- Tabel Users
 CREATE TABLE users (

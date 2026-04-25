@@ -21,7 +21,8 @@ setCorsHeaders();
 $currentUser = validateToken();
 
 // 3. Routing berdasarkan HTTP method
-$method = $_SERVER['REQUEST_METHOD'];
+$bodyForMethodOverride = getRequestBody();
+$method = strtoupper($bodyForMethodOverride['_method'] ?? $_GET['_method'] ?? $_SERVER['REQUEST_METHOD']);
 
 switch ($method) {
     case 'GET':

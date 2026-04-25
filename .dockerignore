@@ -1,4 +1,4 @@
-# Abaikan file yang tidak perlu di-upload ke Railway/Git
+# Abaikan file yang tidak perlu di-build ke image Render
 node_modules/
 .env
 .env.local

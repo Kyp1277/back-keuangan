@@ -3,15 +3,30 @@
 // KONFIGURASI DATABASE
 // File: /config/database.php
 //
-// Mendukung environment variable Railway
-// Jika tidak ada env var, pakai nilai default (lokal)
+// Konfigurasi database untuk Render / local development.
+// Di production, isi env var di Render dashboard:
+// DB_HOST, DB_PORT, DB_USER, DB_PASS, DB_NAME
 // ============================================
 
-define('DB_HOST', getenv('MYSQLHOST')     ?: getenv('DB_HOST') ?: 'localhost');
-define('DB_PORT', getenv('MYSQLPORT')     ?: getenv('DB_PORT') ?: '3306');
-define('DB_USER', getenv('MYSQLUSER')     ?: getenv('DB_USER') ?: 'root');
-define('DB_PASS', getenv('MYSQLPASSWORD') ?: getenv('DB_PASS') ?: '');
-define('DB_NAME', getenv('MYSQLDATABASE') ?: getenv('DB_NAME') ?: 'umkm_keuangan');
+$databaseUrl = getenv('DATABASE_URL') ?: getenv('MYSQL_URL') ?: '';
+$urlConfig = [];
+
+if ($databaseUrl) {
+    $parsedUrl = parse_url($databaseUrl);
+    $urlConfig = [
+        'host' => $parsedUrl['host'] ?? null,
+        'port' => $parsedUrl['port'] ?? null,
+        'user' => isset($parsedUrl['user']) ? urldecode($parsedUrl['user']) : null,
+        'pass' => isset($parsedUrl['pass']) ? urldecode($parsedUrl['pass']) : null,
+        'name' => isset($parsedUrl['path']) ? ltrim($parsedUrl['path'], '/') : null,
+    ];
+}
+
+define('DB_HOST', getenv('MYSQLHOST')     ?: getenv('DB_HOST') ?: ($urlConfig['host'] ?? 'localhost'));
+define('DB_PORT', getenv('MYSQLPORT')     ?: getenv('DB_PORT') ?: ($urlConfig['port'] ?? '3306'));
+define('DB_USER', getenv('MYSQLUSER')     ?: getenv('DB_USER') ?: ($urlConfig['user'] ?? 'root'));
+define('DB_PASS', getenv('MYSQLPASSWORD') ?: getenv('DB_PASS') ?: ($urlConfig['pass'] ?? ''));
+define('DB_NAME', getenv('MYSQLDATABASE') ?: getenv('DB_NAME') ?: ($urlConfig['name'] ?? 'umkm_keuangan'));
 
 /**
  * Fungsi untuk mendapatkan koneksi PDO ke database.

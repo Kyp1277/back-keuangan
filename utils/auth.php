@@ -45,7 +45,11 @@ function validateToken(): array {
     $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
 
     // Cek format "Bearer <token>"
-    if (!str_starts_with($authHeader, 'Bearer ')) {
+    if (str_starts_with($authHeader, 'Bearer ')) {
+        $token = substr($authHeader, 7);
+    } elseif (!empty($_GET['token'])) {
+        $token = $_GET['token'];
+    } else {
         http_response_code(401);
         echo json_encode([
             'status'  => 'error',
@@ -54,7 +58,6 @@ function validateToken(): array {
         exit;
     }
 
-    $token = substr($authHeader, 7); // Hapus "Bearer " di depan
     $parts = explode('.', $token);
 
     // Token harus punya 2 bagian: payload & signature
