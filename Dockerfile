@@ -8,8 +8,10 @@ FROM php:8.2-apache
 # Install ekstensi PDO MySQL (dibutuhkan untuk koneksi database)
 RUN docker-php-ext-install pdo pdo_mysql
 
-# Enable mod_rewrite Apache (untuk routing URL yang bersih)
-RUN a2enmod rewrite
+# Fix: "More than one MPM loaded"
+# php:8.2-apache mengaktifkan mpm_event secara default,
+# tapi mod_php butuh mpm_prefork. Nonaktifkan yang lama, aktifkan yang benar.
+RUN a2dismod mpm_event && a2enmod mpm_prefork rewrite
 
 # Copy semua file project ke document root Apache
 COPY . /var/www/html/
